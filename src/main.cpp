@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <memory>
+#include <unordered_map>
 
 class CheatsManager {
 public:
@@ -106,10 +108,31 @@ private:
     std::vector<std::string> commands;
 };
 
+class NPC {
+public:
+    NPC(const std::string& name, const std::vector<std::string>& dialogues)
+        : name(name), dialogues(dialogues), currentDialogueIndex(0) {}
+
+    void interact() {
+        if (currentDialogueIndex < dialogues.size()) {
+            std::cout << name << ": " << dialogues[currentDialogueIndex] << "\n";
+            currentDialogueIndex++;
+        } else {
+            std::cout << name << ": I've got nothing else to say.\n";
+        }
+    }
+
+private:
+    std::string name;
+    std::vector<std::string> dialogues;
+    size_t currentDialogueIndex;
+};
+
 class Game {
 public:
     Game() {
         window.create(sf::VideoMode(800, 600), "Break This Game");
+        initializeNPCs();
     }
 
     void run() {
@@ -127,6 +150,21 @@ private:
     sf::RenderWindow window;
     CheatsManager cheatsManager; // Cheats manager instance
     Console console{cheatsManager}; // Console instance with cheats manager
+    std::vector<std::shared_ptr<NPC>> npcs; // Vector to hold NPCs
+
+    void initializeNPCs() {
+        // Create NPCs with misleading hints
+        npcs.push_back(std::make_shared<NPC>("Old Man", std::vector<std::string>{
+            "Have you tried looking in the shadows?",
+            "There's a secret in the ground beneath you.",
+            "Maybe if you enter the code 12345, you'll find something.",
+            "I wouldn't trust the signs on the walls."}));
+        
+        npcs.push_back(std::make_shared<NPC>("Mysterious Stranger", std::vector<std::string>{
+            "The true treasure lies within your reach, if only you dare to touch it.",
+            "Hacks? They're just enhancements, my friend.",
+            "Sometimes the answer is right in front of you... if you can find it."}));
+    }
 
     void processEvents() {
         sf::Event event;
@@ -136,6 +174,8 @@ private:
             } else if (event.type == sf::Event::KeyPressed) {
                 if (event.key.code == sf::Keyboard::F1) { // Toggle console with F1
                     console.toggle();
+                } else if (event.key.code == sf::Keyboard::E) { // Interact with NPC with E
+                    interactWithNPC();
                 }
             } else if (event.type == sf::Event::TextEntered) {
                 if (console.isActive() && event.text.unicode < 128) {
@@ -149,6 +189,13 @@ private:
                     }
                 }
             }
+        }
+    }
+
+    void interactWithNPC() {
+        // Simple interaction logic with the first NPC for demonstration
+        if (!npcs.empty()) {
+            npcs[0]->interact(); // Interact with the first NPC in the list
         }
     }
 
