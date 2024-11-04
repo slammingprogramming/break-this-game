@@ -18,6 +18,33 @@ Unleash your inner hacker and unravel the secrets of **Break This Game**! In thi
 - **Meta Challenges Across Updates**: If you play sequential updates, you’ll find evolving challenges that make previously impossible tasks solvable.
 - **Open-Source and Moddable**: This game is designed to be open and accessible. Fork it, modify it, and share your changes with the community!
 
+## 🛠️ Dependencies
+
+**Break This Game** requires several libraries and tools for development. Below is a list of the necessary dependencies and installation instructions for various platforms:
+
+1. **SFML** - A multimedia library for graphics and input.
+   - Install via the package manager or download from the [SFML website](https://www.sfml-dev.org/download.php).
+
+2. **OpenAL** - A cross-platform audio API for sound.
+   - Available through package managers or download from [OpenAL Soft](https://openal-soft.org/).
+
+3. **CMake** - A build system generator.
+   - Install via your package manager or download from the [CMake website](https://cmake.org/download/).
+
+4. **GLM** - OpenGL Mathematics library for linear algebra.
+   - Available through package managers or download from the [GLM GitHub](https://github.com/g-truc/glm).
+
+5. **OpenGL** - Graphics rendering API.
+   - Included with most graphics drivers; ensure they are updated.
+
+6. **Lua** - A lightweight scripting language for game scripting.
+   - Install via the package manager or download from the [Lua website](https://www.lua.org/download.html).
+
+7. **ENet** - Networking library for multiplayer capabilities.
+   - Available through package managers or download from the [ENet GitHub](https://github.com/ADecayingSoul/enet).
+
+Refer to the [INSTALL.md](docs/INSTALL.md) for detailed instructions on installing these dependencies on your platform.
+
 ## 🚀 Getting Started
 
 To dive into **Break This Game**, follow these steps:
@@ -54,7 +81,19 @@ We welcome contributions to **Break This Game**! Whether you want to add new cha
 
 ## 📜 License
 
-**Break This Game** is released under the [GNU General Public License v3.0](LICENSE). Feel free to use, modify, and distribute the game under the terms of the GPL v3.
+**Break This Game** is released under the [GNU General Public License v3.0](LICENSE). You are free to use, modify, and distribute the game under the terms of the GPL v3. 
+
+This project incorporates various third-party libraries and tools, each with its own licensing terms:
+
+- **SFML**: zlib/png License
+- **OpenAL**: LGPL (Lesser General Public License)
+- **CMake**: BSD-3-Clause License
+- **GLM**: MIT License
+- **OpenGL**: Various (permissive licenses depending on implementation)
+- **Lua**: MIT License
+- **ENet**: MIT License
+
+When using or modifying this project, please ensure that you comply with the respective licenses of these dependencies, particularly regarding distribution and modifications.
 
 ## Support
 
