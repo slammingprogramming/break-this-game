@@ -1,0 +1,24 @@
+# Compiled object files
+*.o
+*.obj
+
+# Executables
+*.exe
+*.out
+*.app
+
+# CMake generated files
+/build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE-specific files
+.vscode/
+.idea/
+*.swp
