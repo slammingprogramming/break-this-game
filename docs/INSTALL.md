@@ -66,19 +66,41 @@ After installing the dependencies, you should be ready to compile and run **Brea
 git clone https://github.com/slammingprogramming/break-this-game.git
 cd break-this-game
 
-## Building the Project
+## Building the Project with CMake
 
-1. Create a build directory:
-```bash
-mkdir build
-cd build
+To build **Break This Game**, you will need to use CMake. Follow these steps based on your platform:
 
-2. Run CMake to configure the project:
-```bash
-cmake ..
+### On Windows
 
-3. Build the project:
-make
+1. Open Command Prompt and navigate to the project directory.
+2. Create a build directory:
+   mkdir build && cd build
+3. Run CMake:
+   cmake ..
+4. Compile the project:
+   cmake --build .
+
+### On macOS
+
+1. Open Terminal and navigate to the project directory.
+2. Create a build directory:
+   mkdir build && cd build
+3. Run CMake:
+   cmake ..
+4. Compile the project:
+   cmake --build .
+
+### On Linux
+
+1. Open Terminal and navigate to the project directory.
+2. Create a build directory:
+   mkdir build && cd build
+3. Run CMake:
+   cmake ..
+4. Compile the project:
+   cmake --build .
+
+Make sure you have all the necessary dependencies installed as outlined in the Dependencies section.
 
 ## Running the Game
 ./break-this-game
