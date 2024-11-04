@@ -5,9 +5,40 @@
 #include <vector>
 #include <sstream>
 
+class CheatsManager {
+public:
+    void enableInvincibility() {
+        invincibilityEnabled = true;
+        std::cout << "Invincibility enabled!\n";
+    }
+
+    void disableInvincibility() {
+        invincibilityEnabled = false;
+        std::cout << "Invincibility disabled!\n";
+    }
+
+    void teleport(float x, float y) {
+        playerPosition.x = x;
+        playerPosition.y = y;
+        std::cout << "Teleported to (" << x << ", " << y << ")!\n";
+    }
+
+    bool isInvincible() const {
+        return invincibilityEnabled;
+    }
+
+    sf::Vector2f getPlayerPosition() const {
+        return playerPosition;
+    }
+
+private:
+    bool invincibilityEnabled = false;
+    sf::Vector2f playerPosition{0, 0}; // Initial player position
+};
+
 class Console {
 public:
-    Console() : isActive(false) {}
+    Console(CheatsManager& cheatsManager) : cheatsManager(cheatsManager), isActive(false) {}
 
     void toggle() {
         isActive = !isActive;
@@ -18,13 +49,32 @@ public:
 
     void addCommand(const std::string& command) {
         commands.push_back(command);
-        if (command == "help") {
+        std::istringstream iss(command);
+        std::string cmd;
+        iss >> cmd;
+
+        if (cmd == "help") {
             std::cout << "Available commands:\n";
             std::cout << "  help - Show this help message\n";
             std::cout << "  exit - Exit the game\n";
+            std::cout << "  invincibility - Enable/disable invincibility\n";
+            std::cout << "  teleport <x> <y> - Teleport to specified coordinates\n";
             // Add more commands here as needed
-        } else if (command == "exit") {
+        } else if (cmd == "exit") {
             exitGame = true; // Flag to exit the game loop
+        } else if (cmd == "invincibility") {
+            if (cheatsManager.isInvincible()) {
+                cheatsManager.disableInvincibility();
+            } else {
+                cheatsManager.enableInvincibility();
+            }
+        } else if (cmd == "teleport") {
+            float x, y;
+            if (iss >> x >> y) {
+                cheatsManager.teleport(x, y);
+            } else {
+                std::cout << "Usage: teleport <x> <y>\n";
+            }
         } else {
             std::cout << "Unknown command: " << command << "\n";
         }
@@ -49,6 +99,7 @@ public:
     }
 
 private:
+    CheatsManager& cheatsManager; // Reference to CheatsManager
     bool isActive;
     bool exitGame = false;
     std::string input;
@@ -74,7 +125,8 @@ public:
 
 private:
     sf::RenderWindow window;
-    Console console;
+    CheatsManager cheatsManager; // Cheats manager instance
+    Console console{cheatsManager}; // Console instance with cheats manager
 
     void processEvents() {
         sf::Event event;
@@ -101,7 +153,10 @@ private:
     }
 
     void update() {
-        // Update game logic here
+        // Update game logic here, check for invincibility status if needed
+        if (cheatsManager.isInvincible()) {
+            // Logic for when player is invincible
+        }
     }
 
     void render() {
