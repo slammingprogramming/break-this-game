@@ -39,71 +39,83 @@ jobs:
             c_compiler: cl
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set reusable strings
-      id: strings
-      shell: bash
-      run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+      - name: Install SFML (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsfml-dev
 
-    - name: Check for version.txt
-      id: version
-      run: |
-        if [ ! -f version.txt ]; then
-          echo "0.0.0" > version.txt
-        fi
-        VERSION=$(cat version.txt)
-        echo "Current version: $VERSION"
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Install SFML (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          vcpkg install sfml
+          vcpkg integrate install
 
-    - name: Increment Version
-      id: increment_version
-      run: |
-        IFS='.' read -r major minor patch <<< "$VERSION"
-        patch=$((patch + 1))
-        NEW_VERSION="$major.$minor.$patch"
-        echo "$NEW_VERSION" > version.txt
-        echo "New version: $NEW_VERSION"
-        echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+      - name: Set reusable strings
+        id: strings
+        shell: bash
+        run: |
+          echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: Commit Updated Version
-      run: |
-        git config user.name "GitHub Action"
-        git config user.email "action@github.com"
-        git add version.txt
-        git commit -m "Increment version to ${NEW_VERSION} [skip ci]" || echo "No changes to commit"
-        git push origin main
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check for version.txt
+        id: version
+        run: |
+          if [ ! -f version.txt ]; then
+            echo "0.0.0" > version.txt
+          fi
+          VERSION=$(cat version.txt)
+          echo "Current version: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-    - name: Configure CMake
-      run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -S ${{ github.workspace }}
+      - name: Increment Version
+        id: increment_version
+        run: |
+          IFS='.' read -r major minor patch <<< "$VERSION"
+          patch=$((patch + 1))
+          NEW_VERSION="$major.$minor.$patch"
+          echo "$NEW_VERSION" > version.txt
+          echo "New version: $NEW_VERSION"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
-    - name: Build
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+      - name: Commit Updated Version
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git add version.txt
+          git commit -m "Increment version to ${NEW_VERSION} [skip ci]" || echo "No changes to commit"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Test
-      working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      run: ctest --build-config ${{ matrix.build_type }}
+      - name: Configure CMake
+        run: >
+          cmake -B ${{ steps.strings.outputs.build-output-dir }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -S ${{ github.workspace }}
 
-    - name: Package
-      run: |
-        # Create a package directory
-        mkdir -p ${GITHUB_WORKSPACE}/package
-        # Move the built files to the package directory (adjust as necessary)
-        cp -r ${GITHUB_WORKSPACE}/build/bin/* ${GITHUB_WORKSPACE}/package/
-        # Create a zip archive of the package
-        cd ${GITHUB_WORKSPACE}/package
-        zip -r "release v${NEW_VERSION}.zip" .
+      - name: Build
+        run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
-    - name: Upload Package
-      uses: actions/upload-artifact@v3
-      with:
-        name: package
-        path: ${GITHUB_WORKSPACE}/package/release v${NEW_VERSION}.zip
+      - name: Test
+        working-directory: ${{ steps.strings.outputs.build-output-dir }}
+        run: ctest --build-config ${{ matrix.build_type }}
+
+      - name: Package
+        run: |
+          # Create a package directory
+          mkdir -p ${GITHUB_WORKSPACE}/package
+          # Move the built files to the package directory (adjust as necessary)
+          cp -r ${GITHUB_WORKSPACE}/build/bin/* ${GITHUB_WORKSPACE}/package/
+          # Create a zip archive of the package
+          cd ${GITHUB_WORKSPACE}/package
+          zip -r "release v${NEW_VERSION}.zip" .
+
+      - name: Upload Package
+        uses: actions/upload-artifact@v3
+        with:
+          name: package
+          path: ${GITHUB_WORKSPACE}/package/release v${NEW_VERSION}.zip
