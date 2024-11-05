@@ -108,8 +108,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Dependencies
+        shell: bash
         run: |
-          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
             sudo apt-get update
             sudo apt-get install -y build-essential cmake libsfml-dev libopenal-dev libglm-dev liblua5.3-dev
             git clone https://github.com/lsalzman/enet.git
@@ -118,7 +119,7 @@ jobs:
             cmake ..
             make
             sudo make install
-          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+          elif [ "${{ matrix.os }}" = "windows-latest" ]; then
             choco install mingw cmake sfml openal glm lua
             git clone https://github.com/lsalzman/enet.git
             cd enet
