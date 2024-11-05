@@ -85,6 +85,7 @@ jobs:
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
+          git pull origin main --rebase || echo "No new changes to pull"
           git add version.txt
           git commit -m "Increment version to ${NEW_VERSION} [skip ci]" || echo "No changes to commit"
           git push origin main
