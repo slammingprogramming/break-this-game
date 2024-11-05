@@ -13,6 +13,8 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write  # Allow the action to push changes to the repository
 
     strategy:
       fail-fast: false
