@@ -49,6 +49,7 @@ jobs:
 
       - name: Check for version.txt
         id: version
+        shell: bash
         run: |
           if [ ! -f version.txt ]; then
             echo "0.0.0" > version.txt
@@ -122,6 +123,7 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DCMAKE_PREFIX_PATH="${{ matrix.os == 'windows-latest' && 'C:/ProgramData/chocolatey/lib/glm' || '/usr;/usr/local' }}"  # Add paths here if needed
           -S ${{ github.workspace }}
 
       - name: Build
