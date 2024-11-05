@@ -3,11 +3,9 @@ name: CMake on multiple platforms
 on:
   push:
     branches: [ "main" ]
-    # Only trigger if the commit message does NOT contain "[skip ci]"
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
   pull_request:
     branches: [ "main" ]
-    # Only trigger if the pull request does NOT contain "[skip ci]"
     if: "!contains(github.event.pull_request.title, '[skip ci]')"
 
 jobs:
@@ -42,18 +40,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install SFML (Ubuntu)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libsfml-dev
-
-      - name: Install SFML (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-          vcpkg install sfml
-          vcpkg integrate install
 
       - name: Set reusable strings
         id: strings
@@ -92,6 +78,27 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Install Dependencies
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y build-essential cmake libsfml-dev libopenal-dev libglm-dev liblua5.3-dev
+            git clone https://github.com/lsalzman/enet.git
+            cd enet
+            mkdir build && cd build
+            cmake ..
+            make
+            sudo make install
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            choco install mingw cmake sfml openal glm lua
+            git clone https://github.com/lsalzman/enet.git
+            cd enet
+            mkdir build
+            cd build
+            cmake ..
+            cmake --build .
+          fi
+
       - name: Configure CMake
         run: >
           cmake -B ${{ steps.strings.outputs.build-output-dir }}
@@ -109,16 +116,13 @@ jobs:
 
       - name: Package
         run: |
-          # Create a package directory
           mkdir -p ${GITHUB_WORKSPACE}/package
-          # Move the built files to the package directory (adjust as necessary)
           cp -r ${GITHUB_WORKSPACE}/build/bin/* ${GITHUB_WORKSPACE}/package/
-          # Create a zip archive of the package
           cd ${GITHUB_WORKSPACE}/package
-          zip -r "release v${NEW_VERSION}.zip" .
+          zip -r "release-v${NEW_VERSION}-${{ matrix.os }}.zip" .
 
       - name: Upload Package
         uses: actions/upload-artifact@v3
         with:
-          name: package
-          path: ${GITHUB_WORKSPACE}/package/release v${NEW_VERSION}.zip
+          name: release-${{ matrix.os }}
+          path: ${GITHUB_WORKSPACE}/package/release-v${NEW_VERSION}-${{ matrix.os }}.zip
