@@ -113,6 +113,10 @@ jobs:
           if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
             sudo apt-get update
             sudo apt-get install -y build-essential cmake libsfml-dev libopenal-dev libglm-dev liblua5.3-dev
+            # Find GLM installation path
+            GLM_PATH=$(find /usr/include -name "glm" -type d | head -n 1)
+            echo "GLM found at: $GLM_PATH"
+            echo "GLM_DIR=$GLM_PATH" >> $GITHUB_ENV
             git clone https://github.com/lsalzman/enet.git
             cd enet
             mkdir build && cd build
@@ -121,6 +125,10 @@ jobs:
             sudo make install
           elif [ "${{ matrix.os }}" = "windows-latest" ]; then
             choco install mingw cmake sfml openal glm lua
+            # Check where GLM is installed
+            GLM_PATH=$(where glm-config.cmake 2>/dev/null || echo "GLM not found")
+            echo "GLM found at: $GLM_PATH"
+            echo "GLM_DIR=$(dirname $GLM_PATH)" >> $GITHUB_ENV
             git clone https://github.com/lsalzman/enet.git
             cd enet
             mkdir build
@@ -135,7 +143,7 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-          -DCMAKE_PREFIX_PATH="${{ matrix.os == 'windows-latest' && 'C:/ProgramData/chocolatey/lib/glm' || '/usr;/usr/local;/usr/include/glm' }}" \
+          -DCMAKE_PREFIX_PATH="${{ env.GLM_DIR }}" \
           -S ${{ github.workspace }}
 
       - name: Build
