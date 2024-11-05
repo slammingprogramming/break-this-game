@@ -58,9 +58,11 @@ jobs:
           echo "Current version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Increment Version
+      - name: Increment Version (Cross-platform)
         id: increment_version
+        shell: bash
         run: |
+          VERSION=$(cat version.txt)
           IFS='.' read -r major minor patch <<< "$VERSION"
           patch=$((patch + 1))
           NEW_VERSION="$major.$minor.$patch"
@@ -73,23 +75,15 @@ jobs:
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
 
-          # Stash any unstaged changes before pulling
           git stash || echo "No unstaged changes to stash"
-
-          # Pull with rebase and handle conflicts
-          git pull origin main --rebase || {
-            echo "Rebase failed, aborting."
-            git rebase --abort
-            exit 1
-          }
+          git pull origin main --rebase || { git rebase --abort; exit 1; }
 
           git add version.txt
           git commit -m "Increment version to ${NEW_VERSION} [skip ci]" || echo "No changes to commit"
-
-          # Retry push logic
+          
           for i in {1..5}; do
             git push origin main && break || {
-              echo "Push failed, attempting to pull and retry..."
+              echo "Push failed, retrying..."
               git pull origin main --rebase
             }
           done
@@ -118,12 +112,12 @@ jobs:
           fi
 
       - name: Configure CMake
-        run: >
-          cmake -B ${{ steps.strings.outputs.build-output-dir }}
-          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-          -DCMAKE_PREFIX_PATH="${{ matrix.os == 'windows-latest' && 'C:/ProgramData/chocolatey/lib/glm' || '/usr;/usr/local' }}"  # Add paths here if needed
+        run: |
+          cmake -B ${{ steps.strings.outputs.build-output-dir }} \
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DCMAKE_PREFIX_PATH="${{ matrix.os == 'windows-latest' && 'C:/ProgramData/chocolatey/lib/glm' || '/usr;/usr/local' }}" \
           -S ${{ github.workspace }}
 
       - name: Build
