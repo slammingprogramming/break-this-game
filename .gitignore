@@ -40,6 +40,8 @@ CTestTestfile.cmake
 .idea/
 *.swp
 *~
+.vs/
+
 
 # Ignore CMake export files
 *.cmake
