@@ -1,24 +1,63 @@
-# Compiled object files
+# Ignore build directories
+/build/
+/_build/
+/out/
+/bin/
+/lib/
+/CMakeFiles/
+/CMakeCache.txt
+
+# Ignore compiled object files
 *.o
 *.obj
+*.lo
+*.slo
 
-# Executables
+# Ignore executables and libraries
 *.exe
 *.out
 *.app
+*.dylib
+*.dll
+*.so
+*.a
+*.lib
 
-# CMake generated files
-/build/
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
+# Ignore logs and debugging files
+*.log
+*.trace
+*.stackdump
+*.dSYM/
+
+# Ignore other CMake files
+Testing/
 Makefile
+cmake_install.cmake
+CTestTestfile.cmake
 
-# OS-specific files
-.DS_Store
-Thumbs.db
-
-# Editor/IDE-specific files
+# Ignore IDE or editor-specific files
 .vscode/
 .idea/
 *.swp
+*~
+
+# Ignore CMake export files
+*.cmake
+
+# Ignore dependency libraries or package manager files (if using Conan or vcpkg)
+.conan/
+vcpkg_installed/
+
+# Ignore user-specific files or configurations
+*.user
+*.DS_Store
+*.directory
+
+# Ignore clang/gcc address sanitizer logs
+*.tsan.*
+*.asan.*
+*.msan.*
+*.lsan.*
+
+# Ignore generated documentation
+/docs/doxygen/
