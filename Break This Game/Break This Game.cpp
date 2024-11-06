@@ -1,3 +1,6 @@
+﻿// Break This Game.cpp : Defines the entry point for the application.
+//
+
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <iostream>
@@ -35,7 +38,7 @@ public:
 
 private:
     bool invincibilityEnabled = false;
-    sf::Vector2f playerPosition{0, 0}; // Initial player position
+    sf::Vector2f playerPosition{ 0, 0 }; // Initial player position
 };
 
 class Console {
@@ -62,22 +65,28 @@ public:
             std::cout << "  invincibility - Enable/disable invincibility\n";
             std::cout << "  teleport <x> <y> - Teleport to specified coordinates\n";
             // Add more commands here as needed
-        } else if (cmd == "exit") {
+        }
+        else if (cmd == "exit") {
             exitGame = true; // Flag to exit the game loop
-        } else if (cmd == "invincibility") {
+        }
+        else if (cmd == "invincibility") {
             if (cheatsManager.isInvincible()) {
                 cheatsManager.disableInvincibility();
-            } else {
+            }
+            else {
                 cheatsManager.enableInvincibility();
             }
-        } else if (cmd == "teleport") {
+        }
+        else if (cmd == "teleport") {
             float x, y;
             if (iss >> x >> y) {
                 cheatsManager.teleport(x, y);
-            } else {
+            }
+            else {
                 std::cout << "Usage: teleport <x> <y>\n";
             }
-        } else {
+        }
+        else {
             std::cout << "Unknown command: " << command << "\n";
         }
     }
@@ -117,7 +126,8 @@ public:
         if (currentDialogueIndex < dialogues.size()) {
             std::cout << name << ": " << dialogues[currentDialogueIndex] << "\n";
             currentDialogueIndex++;
-        } else {
+        }
+        else {
             std::cout << name << ": I've got nothing else to say.\n";
         }
     }
@@ -149,21 +159,21 @@ public:
 private:
     sf::RenderWindow window;
     CheatsManager cheatsManager; // Cheats manager instance
-    Console console{cheatsManager}; // Console instance with cheats manager
+    Console console{ cheatsManager }; // Console instance with cheats manager
     std::vector<std::shared_ptr<NPC>> npcs; // Vector to hold NPCs
 
     void initializeNPCs() {
         // Create NPCs with misleading hints
         npcs.push_back(std::make_shared<NPC>("Old Man", std::vector<std::string>{
             "Have you tried looking in the shadows?",
-            "There's a secret in the ground beneath you.",
-            "Maybe if you enter the code 12345, you'll find something.",
-            "I wouldn't trust the signs on the walls."}));
-        
+                "There's a secret in the ground beneath you.",
+                "Maybe if you enter the code 12345, you'll find something.",
+                "I wouldn't trust the signs on the walls."}));
+
         npcs.push_back(std::make_shared<NPC>("Mysterious Stranger", std::vector<std::string>{
             "The true treasure lies within your reach, if only you dare to touch it.",
-            "Hacks? They're just enhancements, my friend.",
-            "Sometimes the answer is right in front of you... if you can find it."}));
+                "Hacks? They're just enhancements, my friend.",
+                "Sometimes the answer is right in front of you... if you can find it."}));
     }
 
     void processEvents() {
@@ -171,20 +181,25 @@ private:
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
-            } else if (event.type == sf::Event::KeyPressed) {
+            }
+            else if (event.type == sf::Event::KeyPressed) {
                 if (event.key.code == sf::Keyboard::F1) { // Toggle console with F1
                     console.toggle();
-                } else if (event.key.code == sf::Keyboard::E) { // Interact with NPC with E
+                }
+                else if (event.key.code == sf::Keyboard::E) { // Interact with NPC with E
                     interactWithNPC();
                 }
-            } else if (event.type == sf::Event::TextEntered) {
+            }
+            else if (event.type == sf::Event::TextEntered) {
                 if (console.isActive() && event.text.unicode < 128) {
                     if (event.text.unicode == 13) { // Enter key
                         console.handleInput(console.getInput()); // Process input command
                         console.clear(); // Clear input after processing
-                    } else if (event.text.unicode == 8) { // Backspace key
+                    }
+                    else if (event.text.unicode == 8) { // Backspace key
                         console.backspace(); // Remove last character from input
-                    } else {
+                    }
+                    else {
                         console.addChar(static_cast<char>(event.text.unicode)); // Add character to input
                     }
                 }
